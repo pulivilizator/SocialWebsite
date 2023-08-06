@@ -1,0 +1,21 @@
+.filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+  }
+
+  .filter-bar a {
+    color: #000;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .filter-bar a:hover {
+    color: #555;
+  }
+
+  .filter-bar a.active {
+    color: #555;
+  }

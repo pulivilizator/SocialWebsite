@@ -1,0 +1,14 @@
+<div class="comment">
+    <button onclick="toggleReplyForm(this)">Ответить</button>
+
+    <div class="reply-form">
+        {% include 'blog/includes/comments_form.html' with comment_id=c.id %}
+    </div>
+</div>
+
+<script>
+    function toggleReplyForm(button) {
+        var replyForm = $(button).siblings(".reply-form");
+        replyForm.toggle();
+    }
+</script>

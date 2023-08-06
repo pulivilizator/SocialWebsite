@@ -1,0 +1,33 @@
+
+{% extends 'base.html' %}
+{% block tags %}{% endblock tags %}
+{% block content %}
+	    					<h1 class="mb-3">{{ post.title }}</h1>
+
+					{% if post.photo %}
+					<img src="{{ post.photo.url }}" alt="" class="img-fluid">
+					{% endif %}
+		            </p>
+		            <p>{{post.content}}</p>
+		              <img src="images/image_2.jpg" alt="" class="img-fluid">
+		            </p>
+					<div class="tag-widget post-tag-container mb-5 mt-5">
+		              <div class="tagcloud">
+		                <a href="#" class="tag-cloud-link">Life</a>
+		                <a href="#" class="tag-cloud-link">Sport</a>
+		                <a href="#" class="tag-cloud-link">Tech</a>
+		                <a href="#" class="tag-cloud-link">Travel</a>
+		              </div>
+		            </div>
+
+		            <div class="pt-5 mt-5">
+		              <h3 class="mb-5 font-weight-bold">Комментарии:</h3>
+		              <ul class="comment-list">
+						{% include 'blog/includes/show_comments.html' with post_id=post.id post_slug=post.slug %}
+
+		              </ul>
+		              <!-- END comment-list -->
+
+		              {% include 'blog/includes/comments_form.html' with post_id=post.id post_slug=post.slug %}
+		            </div>
+			    		{% endblock content %}

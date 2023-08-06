@@ -1,0 +1,17 @@
+{% load blog_tags %}
+{% for c in parent_comments %}
+<li class="comment">
+    {% comment %} <div class="vcard bio">
+      <img src="images/person_1.jpg" alt="Image placeholder">
+    </div> {% endcomment %}
+    <div class="comment-body">
+      <a href="{{c.author.user.get_absolute_url}}"><h3>{{ c.author }}</h3></a>
+      <div class="meta">{{ c.created|date:'F d, Y' }}</div>
+      <p>{{ c.content }}</p>
+    </div>
+    {% include 'blog/includes/reply_form.html' with post_id=post_id post_slug=post_slug %}
+    <ul class="children">
+        {% show_children_comments comment=c form=form2 post_id=post_id post_slug=post_slug %}
+  </ul>
+  </li>
+{% endfor %}

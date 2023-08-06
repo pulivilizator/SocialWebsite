@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block auth %}
+<a href="{% url 'users:profile' profile_slug=profile_slug %}" class="link">Профиль</a>   |   <a href="{% url 'users:logout' %}" class="link">Выйти</a>
+{% endblock auth %}
+
+
+{% block content %}
+
+  <div class="comment-form-wrap pt-5">
+    <h3 class="mb-5">Создать пост</h3>
+    <form action="#" class="p-3 p-md-5 bg-light" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-error">{{ form.non_field_errors }}</div>
+
+        {% for f in form %}
+        <div class="form-group">
+            <label for="{{f.id_for_label}}">{{f.label}}</label>
+            <div class="form-error">{{ f.errors }}</div>
+            <p class='form_control-lg' type="text">{{ f }}</p>
+          </div>
+        {% endfor %}
+
+      <div class="form-group">
+        <input type="submit" value="Сохранить" class="btn py-3 px-4 btn-primary">
+      </div>
+    </form>
+  </div>
+{% endblock content %}
