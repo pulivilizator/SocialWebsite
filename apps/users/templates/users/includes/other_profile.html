@@ -1,0 +1,11 @@
+<div>
+    <h2>Имя пользователя</h2>
+    <p>{{profile.user.username}}</p>
+    <h2>Email</h2>
+    <p>{{profile.user.email}}</p>
+    {% if following %}
+    <a href="{% url 'users:subscribe' profile_slug=profile.user.username%}?following=1">Отписаться</a><br>
+    {% else %}
+    <a href="{% url 'users:subscribe' profile_slug=profile.user.username%}?following=0">Подписаться</a><br>
+    {% endif %}
+  </div>

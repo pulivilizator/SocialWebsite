@@ -1,0 +1,9 @@
+<div>
+    <h2>Имя пользователя</h2>
+    <p>{{profile.user.username}}</p>
+    <h2>Email</h2>
+    <p>{{profile.user.email}}</p>
+    <h2><a href="{% url 'users:change_username' %}">Сменить username</a><br></h2>
+    <h2><a href="{% url 'users:change_pass' %}">Сменить пароль</a></h2>
+    <h2><a href="{% url 'users:logout' %}">Выйти</a><br></h2>
+  </div>

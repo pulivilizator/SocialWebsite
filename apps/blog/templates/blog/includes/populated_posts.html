@@ -1,0 +1,22 @@
+{% load blog_tags %}
+<div class="sidebar-box ftco-animate">
+    {% get_pupolated_posts as populated_posts %}
+	<h3 class="sidebar-heading">Обсуждаемые посты на этой неделе</h3>
+	{% for p in populated_posts %}
+	<div class="block-21 mb-4 d-flex">
+		{% if p.photo %}
+		<a class="blog-img mr-4" style="background-image: url({{ p.photo.url }});"></a>
+		{% else %}
+		<a class="blog-img mr-4" style="background-image: url();"></a>
+        {% endif %}
+	  <div class="text">
+		<h3 class="heading"><a href="{{ p.get_absolute_url }}"> {{ p.title }}</a></h3>
+		<div class="meta">
+		  <div><a href="{{ p.get_absolute_url }}"><span class="icon-calendar"></span> {{ p.publish|date:'F d, Y H:i' }}</a></div>
+		  <div><a href="{{ p.author.user.get_absolute_url }}"><span class="icon-person"></span> {{ p.author }}</a></div>
+		  <div><a href="{{ p.get_absolute_url }}"><span class="icon-chat"></span> {{ p.comments.count }}</a></div>
+		</div>
+	  </div>
+	</div>
+	{% endfor %}
+  </div>

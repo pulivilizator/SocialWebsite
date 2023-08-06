@@ -1,0 +1,13 @@
+
+<nav id="colorlib-main-menu" role="navigation">
+    <ul>
+        {% for m in menu %}
+            {% if m.url_name in path %}
+                <li class="colorlib-active"><a href="/{{ m.url_name }}">{{ m.title }}</a></li>
+            {% else %}
+                <li><a href="/{{ m.url_name }}">{{ m.title }}</a></li>
+            {% endif %}
+
+        {% endfor %}
+    </ul>
+</nav>
