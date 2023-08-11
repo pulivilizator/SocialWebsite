@@ -29,11 +29,10 @@ SECRET_KEY = 'django-insecure-2=!azbpi$k+948jyn1i5p4m!e$uj2jo_04&7z-xg(s2&t3t&1f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+SITE_ID = 1
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
+    'django.contrib.postgres',
+
     'blog.apps.BlogConfig',
     'users.apps.UsersConfig',
     'mailings.apps.MailingsConfig',
@@ -148,3 +151,9 @@ MEDIA_URL = '/media/'
 
 LOGIN_URL = 'blog:login'
 LOGOUT_URL = 'blog:logout'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'DmitriyDmGora@gmail.com'
+EMAIL_HOST_PASSWORD = 'rwsixilpifcdqfes'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

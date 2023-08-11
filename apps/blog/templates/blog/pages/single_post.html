@@ -2,13 +2,13 @@
 {% extends 'base.html' %}
 {% load blog_tags %}
 {% block content %}
-	    					<h1 class="mb-3">{{ post.title }}</h1>
+	    					<h1 class="mb-3">{{ post.title|markdown }}</h1>
 
 					{% if post.photo %}
 					<img src="{{ post.photo.url }}" alt="" class="img-fluid">
 					{% endif %}
 		            </p>
-		            <p>{{post.content}}</p>
+		            <p>{{ post.content|linebreaks|markdown }}</p>
 		              <img src="images/image_2.jpg" alt="" class="img-fluid">
 		            </p>
 					<div class="tag-widget post-tag-container mb-5 mt-5">
@@ -53,3 +53,7 @@
 	{% endfor %}
   </div>
 {% endblock recommended %}
+
+{% block search %}
+{% include 'blog/includes/search_form.html' %}
+{% endblock search %}

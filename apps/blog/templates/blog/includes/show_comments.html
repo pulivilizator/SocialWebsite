@@ -1,17 +1,39 @@
 {% load blog_tags %}
 {% for c in parent_comments %}
 <li class="comment">
-    {% comment %} <div class="vcard bio">
-      <img src="images/person_1.jpg" alt="Image placeholder">
-    </div> {% endcomment %}
-    <div class="comment-body">
-      <a href="{{c.author.user.get_absolute_url}}"><h3>{{ c.author }}</h3></a>
-      <div class="meta">{{ c.created|date:'F d, Y H:i' }}</div>
-      <p>{{ c.content }}</p>
-    </div>
-    {% include 'blog/includes/reply_form.html' with post_id=post_id post_slug=post_slug %}
-    <ul class="children">
-        {% show_children_comments comment=c form=form2 post_id=post_id post_slug=post_slug %}
+  <div class="vcard bio">
+    <img src="{{c.author.user.photo.url}}" alt="Image placeholder">
+  </div>
+  <div class="comment-body">
+    <a href="{{c.author.user.get_absolute_url}}"><h3>{{ c.author }}</h3></a>
+    <div class="meta">{{ c.created|date:'F d, Y H:i' }}</div>
+    <p>{{ c.content|markdown }}</p>
+  </div>
+  {% include 'blog/includes/reply_form.html' with post_id=post_id post_slug=post_slug %}
+  {% if c.children.all %}
+  <button class="show-children">Показать ответы</button>
+  {% endif %}
+  <ul class="children">
+    {% show_children_comments comment=c form=form2 post_id=post_id post_slug=post_slug %}
   </ul>
-  </li>
+</li>
 {% endfor %}
+
+<script>
+// Скрываем все блоки с дочерними элементами
+$(".children").hide();
+
+// Обработчик события клика на кнопку "показать ответы"
+$(".show-children").click(function() {
+  // Получаем родительский элемент
+  var parent = $(this).parent();
+  // Получаем блок с дочерними элементами
+  var children = parent.find(".children");
+  // Проверяем видимость блока и изменяем его видимость в зависимости от текущего состояния
+  if (children.is(":visible")) {
+    children.hide();
+  } else {
+    children.show();
+  }
+});
+</script>

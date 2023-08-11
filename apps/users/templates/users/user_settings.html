@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="comment-form-wrap pt-5">
+    <h3 class="mb-5">Настройки профиля</h3>
+    <form action="{% url 'users:edit' %}" class="p-3 p-md-5 bg-light" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-error">{{ form.non_field_errors }}</div>
+        {% if user.user.photo %}
+        <img src="{{ user.user.photo.url }}" alt="user_photo" style="width: 200px; height: auto;">
+        {% endif %}
+        {% for f in form %}
+        <div class="form-group">
+            <label for="{{f.id_for_label}}">{{f.label}}</label>
+            <div class="form-error">{{ f.errors }}</div>
+            {{ f }}
+          </div>
+        {% endfor %}
+        <div class="form-group">
+            <input type="submit" value="Сохранить" class="btn py-3 px-4 btn-primary">
+          </div>
+    </form>
+  </div>
+{% endblock content %}

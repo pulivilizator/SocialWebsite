@@ -1,6 +1,5 @@
 from django.urls import path
 
-
 from .views import *
 
 
@@ -14,5 +13,6 @@ urlpatterns = [
          PostDetail.as_view(), name='post_detail'),
     path("add_post/", AddPostView.as_view(), name="add_post"),
     path("comment/<int:post_id>/<slug:post_slug>/",
-         AddCommentView.as_view(), name="post_comments")
+         AddCommentView.as_view(), name="post_comments"),
+    path('search/', SearchView.as_view(), name='search'),
 ]

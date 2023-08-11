@@ -1,9 +1,14 @@
 <div>
-    <h2>Имя пользователя</h2>
-    <p>{{profile.user.username}}</p>
-    <h2>Email</h2>
-    <p>{{profile.user.email}}</p>
-    <h2><a href="{% url 'users:change_username' %}">Сменить username</a><br></h2>
+  <div>
+  <h2>{{profile.user.first_name}} {{profile.user.last_name}}</h2>
+  </div>
+<h3><p>{{profile.user.username}}</p></h3>
+    <h5><a href="{% url 'users:change_username' %}">Изменить имя пользователя</a></h5>
+{% if profile.photo %}
+<img src="{{ profile.photo.url }}" alt="user_photo" style="width: 200px; height: auto;">
+{% endif %}
+    <p>Email: {{profile.user.email}}</p>
+    <h2><a href="{% url 'users:edit' %}">Настроить профиль</a></h2>
     <h2><a href="{% url 'users:change_pass' %}">Сменить пароль</a></h2>
     <h2><a href="{% url 'users:logout' %}">Выйти</a><br></h2>
   </div>

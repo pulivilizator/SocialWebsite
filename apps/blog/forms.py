@@ -27,3 +27,8 @@ class AddCommentForm(forms.ModelForm):
     class Meta:
         model = models.Comment
         fields = ('content', )
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField(widget=forms.TextInput(
+        attrs={'class': "form-control", 'placeholder': "Type a keyword and hit enter"}))

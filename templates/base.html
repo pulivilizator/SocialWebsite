@@ -54,6 +54,12 @@
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .children {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -98,29 +104,10 @@
 						<a href="{% url 'blog:add_post' %}" class="link">Написать пост</a>   |   <a href="{% url 'users:profile' profile_slug=profile_slug %}" class="link">Профиль</a>   |   <a href="{% url 'users:logout' %}" class="link">Выйти</a>
 						{% endif %}
 					  	{% endblock auth %}
-	            <div class="sidebar-box pt-md-4">
-	              <form action="#" class="search-form">
-	                <div class="form-group">
-	                  <span class="icon icon-search"></span>
-	                  <input type="text" class="form-control" placeholder="Type a keyword and hit enter">
-	                </div>
-	              </form>
-	            </div>
+				{% block search %}
+				{% include 'blog/includes/search_form.html' %}
+				{% endblock search %}
 				{% block recommended %}
-	            <div class="sidebar-box ftco-animate">
-	              <h3 class="sidebar-heading">Popular Articles</h3>
-	              <div class="block-21 mb-4 d-flex">
-	                <a class="blog-img mr-4" style="background-image: url(images/image_1.jpg);"></a>
-	                <div class="text">
-	                  <h3 class="heading"><a href="#">Even the all-powerful Pointing has no control</a></h3>
-	                  <div class="meta">
-	                    <div><a href="#"><span class="icon-calendar"></span> June 28, 2019</a></div>
-	                    <div><a href="#"><span class="icon-person"></span> Dave Lewis</a></div>
-	                    <div><a href="#"><span class="icon-chat"></span> 19</a></div>
-	                  </div>
-	                </div>
-	              </div>
-	            </div>
 				{% endblock recommended %}
 				{% block tags %}
 	            <div class="sidebar-box ftco-animate">

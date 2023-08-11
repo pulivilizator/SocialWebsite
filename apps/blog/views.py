@@ -1,12 +1,13 @@
 from typing import Any, Dict
 from django.forms.models import BaseModelForm
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.handlers.wsgi import WSGIRequest
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
 from .models import *
 from .forms import *
@@ -27,7 +28,7 @@ class HomePage(DataMixin, ListView):
         else:
             self.queryset = create_queryset_for_homepage(self.request)
             up_context = self.get_user_context(
-                title='Блог', path=self.request.path)
+                title='Блог', path=self.request.path, form_s=SearchForm())
             context.update(up_context)
         return context
 
@@ -43,9 +44,10 @@ class PostDetail(DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         post = get_object_or_404(Post,
                                  id=self.kwargs['post_id'],
-                                 slug=self.kwargs['post_slug'],
-                                 status=Post.Status.PUBLISH)
-        # similar_posts = get_similar_posts(post)
+                                 slug=self.kwargs['post_slug'])
+        if post.status == 'DF' and post.author != self.request.user:
+            raise Http404
+        print(post.status)
         parent_comments = post.comments.filter(parent=None)
         up_context = self.get_user_context(
             title=post.title, post=post, form=AddCommentForm(), form2=AddCommentForm(), parent_comments=parent_comments)
@@ -93,3 +95,20 @@ class AddCommentView(DataMixin, CreateView):
         form.instance.author = author
         form.save()
         return super().form_valid(form)
+
+
+class SearchView(DataMixin, FormView):
+    form_class = SearchForm
+    template_name = 'blog/pages/search.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('query')
+        search_vector = SearchVector('title', 'content')
+        search_query = SearchQuery(query)
+        result = Post.published.annotate(search=search_vector, rank=SearchRank(
+            search_vector, search_query)).filter(search=search_query).order_by('-rank')
+        up_context = self.get_user_context(
+            title='Результаты поиска', posts=result)
+        context.update(up_context)
+        return context

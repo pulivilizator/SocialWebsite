@@ -9,7 +9,7 @@ from taggit.managers import TaggableManager
 
 class PublishManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(status=Post.Status.PUBLISH)
+        return Post.objects.filter(status=Post.Status.PUBLISH)
 
 
 class DraftManager(models.Manager):
@@ -38,8 +38,8 @@ class Post(models.Model):
         User, on_delete=models.CASCADE, verbose_name='Автор')
     tags = TaggableManager()
 
-    objects = models.Manager()
     published = PublishManager()
+    objects = models.Manager()
     draft = DraftManager()
 
     class Meta:

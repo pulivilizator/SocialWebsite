@@ -1,21 +1,23 @@
+from django.views.generic.edit import ModelFormMixin
 from typing import Any, Dict
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.core.handlers.wsgi import WSGIRequest
 from django.views.generic import CreateView, FormView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django import forms
 
 from .models import *
 from .forms import *
 from blog.utils import DataMixin
 
 
-class LoginUser(DataMixin, LoginView):
+class LoginUser(DataMixin, views.LoginView):
     template_name = 'users/login.html'
     success_url = reverse_lazy('blog:home')
     form_class = LoginForm
@@ -33,7 +35,7 @@ class LoginUser(DataMixin, LoginView):
 
 
 @method_decorator(login_required, name='dispatch')
-class LogoutUser(DataMixin, LogoutView):
+class LogoutUser(DataMixin, views.LogoutView):
     success_url = reverse_lazy('users:login')
 
     def get_success_url(self):
@@ -89,7 +91,7 @@ class CreateUser(DataMixin, CreateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ChangePassw(DataMixin, PasswordChangeView):
+class ChangePassw(DataMixin, views.PasswordChangeView):
     form_class = ChangePassFormP
     template_name = 'users/change_pass.html'
     success_url = reverse_lazy('users:change_pass_done')
@@ -116,7 +118,7 @@ class ChangePassw(DataMixin, PasswordChangeView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ChangePasswDone(DataMixin, PasswordChangeDoneView):
+class ChangePasswDone(DataMixin, views.PasswordChangeDoneView):
     template_name = 'users/change_pass_done.html'
     success_url = reverse_lazy('users:profile')
 
@@ -166,3 +168,134 @@ def subscribe_view(request: WSGIRequest, profile_slug):
     else:
         subscriber.following.remove(bloger)
     return redirect('users:profile', profile_slug=profile_slug)
+
+
+class PasswordResetViewP(DataMixin, views.PasswordResetView):
+    form_class = PasswordResetFormP
+    template_name = 'users/password_reset/password_reset.html'
+    success_url = reverse_lazy('users:password_reset_done')
+    email_template_name = 'users/password_reset/password_reset_message.html'
+
+    def get_context_data(self, **kwargs: Any) -> Any:
+        context = super().get_context_data(**kwargs)
+        up_context = self.get_user_context(title='Сброс пароля')
+        context.update(up_context)
+        return context
+
+    # def form_valid(self, form: Any) -> HttpResponse:
+    #     email = form.cleaned_data['email']
+    #     if user := User.objects.filter(email=email)[0]:
+    #         print(user)
+    #         token = self.token_generator.make_token(user)
+    #         print(token)
+    #         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+    #         send_mail(
+    #             subject='Сброс пароля',
+    #             message=render_to_string('users/password_reset/password_reset_message.html', context={
+    #                 'protocol': 'http',
+    #                 'domain': '127.0.0.1:8000',
+    #                 'uid': uidb64,
+    #                 'token': token,
+    #                 'user': user
+    #             }),
+    #             from_email='DmitriyDmGora@gmail.com',
+    #             recipient_list=[email]
+    #         )
+
+    #     return super().form_valid(form)
+
+
+class PasswordResetDoneViewP(DataMixin, views.PasswordResetDoneView):
+    success_url = reverse_lazy('users:login')
+    template_name = 'users/password_reset/password_reset_done.html'
+
+    def get_context_data(self, **kwargs: Any) -> Any:
+        context = super().get_context_data(**kwargs)
+        up_context = self.get_user_context(title='Письмо отправлено')
+        context.update(up_context)
+        return context
+
+
+class PasswordResetConfirmViewP(DataMixin, views.PasswordResetConfirmView):
+    template_name = 'users/password_reset/password_reset_confirm.html'
+    success_url = reverse_lazy('users:login')
+    form_class = NewPasswordResetForm
+
+    def get_context_data(self, **kwargs: Any) -> Any:
+        context = super().get_context_data(**kwargs)
+        up_context = self.get_user_context(title='Письмо отправлено')
+        context.update(up_context)
+        return context
+
+
+# @method_decorator(login_required, 'dispatch')
+# class ChangePhotoView(DataMixin, FormView):
+#     form_class = ChangePhotoForm
+#     template_name = 'users/change_photo.html'
+#     success_url = reverse_lazy('users:profile')
+
+#     def get_success_url(self) -> str:
+#         return reverse_lazy('users:profile', kwargs={'profile_slug': self.request.user.username})
+
+#     def get_context_data(self, **kwargs: Any) -> Any:
+#         context = super().get_context_data(**kwargs)
+#         up_context = self.get_user_context(title='Сменить фото профиля')
+#         context.update(up_context)
+#         return context
+
+#     def form_valid(self, form: Any) -> HttpResponse:
+#         profile = Profile.objects.get(user=self.request.user)
+#         profile.photo = self.request.FILES['photo']
+#         profile.save()
+#         return super().form_valid(form)
+
+
+class SettingsUser(DataMixin, FormView):
+    form_class = UserSettingsForm
+    template_name = 'users/user_settings.html'
+    success_url = reverse_lazy('users:profile')
+
+    def get_success_url(self) -> str:
+        return reverse_lazy('users:profile', kwargs={'profile_slug': self.kwargs['profile_slug']})
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        up_context = self.get_user_context(
+            title='Настройка профиля', user=self.request.user)
+        context.update(up_context)
+        return context
+
+    def get_initial(self) -> Dict[str, Any]:
+        initial = super().get_initial()
+        user = self.request.user
+        self.kwargs['profile_slug'] = user.username
+        initial['photo'] = user.user.photo
+        initial['first_name'] = user.first_name
+        initial['last_name'] = user.last_name
+        initial['email'] = user.email
+        initial['birthday'] = user.user.birthday
+        return initial
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        user = User.objects.get(username=self.request.user.username)
+        profile = user.user
+
+        if first_name := form.cleaned_data['first_name']:
+            user.first_name = first_name
+
+        if last_name := form.cleaned_data['last_name']:
+            user.last_name = last_name
+
+        if email := form.cleaned_data['email']:
+            user.email = email
+
+        if photo := form.cleaned_data['photo']:
+            profile.photo = photo
+
+        if birthday := form.cleaned_data['birthday']:
+            profile.birthday = birthday
+
+        user.save()
+        profile.save()
+
+        return super().form_valid(form)

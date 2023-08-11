@@ -19,12 +19,23 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 
+from django.contrib.sitemaps.views import sitemap
+
+from blog.sitemaps import PostSitemap
+from blog.feeds import LatestPostsFeed
 from selfBlog import settings
+
+sitemaps = {
+    'posts': PostSitemap
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
     path('', lambda request: redirect('blog:home')),
-    path('', include('users.urls'))
+    path('', include('users.urls')),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
+         name='django.contrib.sitemaps.views.sitemap'),
+    path('feed/', LatestPostsFeed(), name='post_feed')
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

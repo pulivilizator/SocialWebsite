@@ -1,0 +1,8 @@
+<div class="sidebar-box pt-md-4">
+    <form action="{% url 'blog:search' %}" class="search-form" method="get">
+        <div class="form-group">
+            <input type="text" name="query" class="form-control" placeholder="Поиск..." required>
+            <span class="icon icon-search" onclick="this.parentNode.parentNode.submit();"></span>
+        </div>
+    </form>
+</div>
