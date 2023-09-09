@@ -23,6 +23,7 @@ from django.contrib.sitemaps.views import sitemap
 
 from blog.sitemaps import PostSitemap
 from blog.feeds import LatestPostsFeed
+
 from selfBlog import settings
 
 sitemaps = {
@@ -36,6 +37,8 @@ urlpatterns = [
     path('', include('users.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
          name='django.contrib.sitemaps.views.sitemap'),
-    path('feed/', LatestPostsFeed(), name='post_feed')
+    path('feed/', LatestPostsFeed(), name='post_feed'),
+    path('', include('mailings.urls')),
+    path('', include('social_django.urls'), name='social'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

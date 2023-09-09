@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
@@ -8,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib import messages
 
 from .models import *
 from .forms import *
@@ -26,11 +28,13 @@ class HomePage(DataMixin, ListView):
         if self.request.GET.get('subscribe') is not None and not self.request.user.is_authenticated:
             context['redirect_to_login'] = True
         else:
-            self.queryset = create_queryset_for_homepage(self.request)
             up_context = self.get_user_context(
                 title='Блог', path=self.request.path, form_s=SearchForm())
             context.update(up_context)
         return context
+    
+    def get_queryset(self) -> QuerySet[Any]:
+        return create_queryset_for_homepage(self.request)
 
 
 class PostDetail(DataMixin, DetailView):

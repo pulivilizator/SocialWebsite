@@ -1,7 +1,5 @@
-from django.views.generic.edit import ModelFormMixin
 from typing import Any, Dict
 from django.forms.models import BaseModelForm
-from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.core.handlers.wsgi import WSGIRequest
 from django.views.generic import CreateView, FormView, DetailView
@@ -10,11 +8,11 @@ from django.contrib.auth import login
 from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django import forms
 
 from .models import *
 from .forms import *
 from blog.utils import DataMixin
+from mailings.models import Mailing
 
 
 class LoginUser(DataMixin, views.LoginView):
@@ -87,6 +85,8 @@ class CreateUser(DataMixin, CreateView):
         u = User.objects.get(username=form.cleaned_data['username'])
         profile = Profile(user=u, slug=u.username)
         profile.save()
+        mailing = Mailing(user=u, active=True)
+        mailing.save()
         return redirect('blog:home')
 
 
@@ -182,28 +182,6 @@ class PasswordResetViewP(DataMixin, views.PasswordResetView):
         context.update(up_context)
         return context
 
-    # def form_valid(self, form: Any) -> HttpResponse:
-    #     email = form.cleaned_data['email']
-    #     if user := User.objects.filter(email=email)[0]:
-    #         print(user)
-    #         token = self.token_generator.make_token(user)
-    #         print(token)
-    #         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-    #         send_mail(
-    #             subject='Сброс пароля',
-    #             message=render_to_string('users/password_reset/password_reset_message.html', context={
-    #                 'protocol': 'http',
-    #                 'domain': '127.0.0.1:8000',
-    #                 'uid': uidb64,
-    #                 'token': token,
-    #                 'user': user
-    #             }),
-    #             from_email='DmitriyDmGora@gmail.com',
-    #             recipient_list=[email]
-    #         )
-
-    #     return super().form_valid(form)
-
 
 class PasswordResetDoneViewP(DataMixin, views.PasswordResetDoneView):
     success_url = reverse_lazy('users:login')
@@ -228,28 +206,7 @@ class PasswordResetConfirmViewP(DataMixin, views.PasswordResetConfirmView):
         return context
 
 
-# @method_decorator(login_required, 'dispatch')
-# class ChangePhotoView(DataMixin, FormView):
-#     form_class = ChangePhotoForm
-#     template_name = 'users/change_photo.html'
-#     success_url = reverse_lazy('users:profile')
-
-#     def get_success_url(self) -> str:
-#         return reverse_lazy('users:profile', kwargs={'profile_slug': self.request.user.username})
-
-#     def get_context_data(self, **kwargs: Any) -> Any:
-#         context = super().get_context_data(**kwargs)
-#         up_context = self.get_user_context(title='Сменить фото профиля')
-#         context.update(up_context)
-#         return context
-
-#     def form_valid(self, form: Any) -> HttpResponse:
-#         profile = Profile.objects.get(user=self.request.user)
-#         profile.photo = self.request.FILES['photo']
-#         profile.save()
-#         return super().form_valid(form)
-
-
+@method_decorator(login_required, name='dispatch')
 class SettingsUser(DataMixin, FormView):
     form_class = UserSettingsForm
     template_name = 'users/user_settings.html'
@@ -299,3 +256,21 @@ class SettingsUser(DataMixin, FormView):
         profile.save()
 
         return super().form_valid(form)
+
+
+@login_required
+def sub_update_site(request: WSGIRequest):
+    user_mailing = request.user.mailing
+    if not user_mailing.active:
+        user_mailing.active = True
+        user_mailing.save()
+    return redirect('users:profile', profile_slug=request.user.username)
+
+
+@login_required
+def unsub_update_site(request: WSGIRequest):
+    user_mailing = request.user.mailing
+    if user_mailing.active:
+        user_mailing.active = False
+        user_mailing.save()
+    return redirect('users:profile', profile_slug=request.user.username)

@@ -10,5 +10,11 @@
     <p>Email: {{profile.user.email}}</p>
     <h2><a href="{% url 'users:edit' %}">Настроить профиль</a></h2>
     <h2><a href="{% url 'users:change_pass' %}">Сменить пароль</a></h2>
+    
+    {% if profile.user.mailing.active %}
+    <h2><a href="{% url 'users:unsub_update_site' %}">Отписаться от обновлений сайта</a></h2>
+    {% else %}
+    <h2><a href="{% url 'users:sub_update_site' %}">Подписаться на обновления сайта</a></h2>
+    {% endif %}
     <h2><a href="{% url 'users:logout' %}">Выйти</a><br></h2>
   </div>

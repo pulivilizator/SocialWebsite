@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import *
+
+@admin.register(Mailing)
+class MailingAdmin(admin.ModelAdmin):
+    list_display = ["user", "date", "active"]
+    list_filter = ["user", "date", "active"]
+    search_fields = ["user"]
+    

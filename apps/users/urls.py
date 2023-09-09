@@ -24,5 +24,7 @@ urlpatterns = [
     path("password_reset/<uidb64>/<token>/",
          PasswordResetConfirmViewP.as_view(), name="password_reset_confirmm"),
     path("edit/", SettingsUser.as_view(), name="edit"),
+    path("sub_update_site/", sub_update_site, name="sub_update_site"),
+    path("unsub_update_site/", unsub_update_site, name="unsub_update_site"),
 
 ]

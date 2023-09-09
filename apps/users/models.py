@@ -4,6 +4,7 @@ from django.urls import reverse
 
 
 class Profile(models.Model):
+    """ Модель профиля """
     user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 verbose_name='пользователь', related_name='user', db_index=True)
     slug = models.SlugField(max_length=50, verbose_name='URL', unique=True)

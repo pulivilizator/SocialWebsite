@@ -62,22 +62,19 @@
   </style>
 </head>
 <body>
-
+	{% if messages %}
+		
+	{% for message in messages %}
+		{{ message|safe }}
+	{% endfor %}
+		
+	{% endif %}
 	<div id="colorlib-page">
 		<a href="#" class="js-colorlib-nav-toggle colorlib-nav-toggle"><i></i></a>
 		<aside id="colorlib-aside" role="complementary" class="js-fullheight">
 			{% show_menu path %}
 
 			<div class="colorlib-footer">
-				<div class="mb-4">
-					<h3>Подпишитесь на обновления</h3>
-					<form action="#" class="colorlib-subscribe-form">
-            <div class="form-group d-flex">
-            	<div class="icon"><span class="icon-paper-plane"></span></div>
-              <input type="text" class="form-control" placeholder="Введите Email адрес">
-            </div>
-          </form>
-				</div>
 				<p class="pfooter"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 	  	  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
 			</div>

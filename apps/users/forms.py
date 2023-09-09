@@ -27,6 +27,12 @@ class CreateUserForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2')
 
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        if User.objects.filter(email=data).exists():
+            raise forms.ValidationError('Email уже используется')
+        return data
+
 
 class ChangePassFormP(PasswordChangeForm):
     old_password = forms.CharField(label='Старый пароль', widget=forms.PasswordInput(
@@ -99,3 +105,9 @@ class UserSettingsForm(forms.Form):
     class Meta:
         fields = ("photo", "first_name",
                   "last_name", "email", "birthday")
+
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        if User.objects.filter(email=data).exists():
+            raise forms.ValidationError('Email уже используется')
+        return data
