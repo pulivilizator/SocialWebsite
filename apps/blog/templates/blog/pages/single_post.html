@@ -2,33 +2,34 @@
 {% extends 'base.html' %}
 {% load blog_tags %}
 {% block content %}
-	    					<h1 class="mb-3">{{ post.title|markdown }}</h1>
+    <span><i class="icon-eye mr-2"></i>{% get_post_views post=post %}</span>
+            <h1 class="mb-3">{{ post.title|markdown }}</h1>
 
-					{% if post.photo %}
-					<img src="{{ post.photo.url }}" alt="" class="img-fluid">
-					{% endif %}
-		            </p>
-		            <p>{{ post.content|linebreaks|markdown }}</p>
-		              <img src="images/image_2.jpg" alt="" class="img-fluid">
-		            </p>
-					<div class="tag-widget post-tag-container mb-5 mt-5">
-		              <div class="tagcloud">
-		                {% for t in post.tags.all %}
-							<a href="{% url 'blog:home' %}?tag_slug={{t.slug}}" class="tag-cloud-link">{{ t }}</a>
-						{% endfor %}
-		              </div>
-		            </div>
+    {% if post.photo %}
+    <img src="{{ post.photo.url }}" alt="" class="img-fluid">
+    {% endif %}
+    </p>
+    <p>{{ post.content|linebreaks|markdown }}</p>
+      <img src="images/image_2.jpg" alt="" class="img-fluid">
+    </p>
+    <div class="tag-widget post-tag-container mb-5 mt-5">
+      <div class="tagcloud">
+        {% for t in post.tags.all %}
+            <a href="{% url 'blog:home' %}?tag_slug={{t.slug}}" class="tag-cloud-link">{{ t }}</a>
+        {% endfor %}
+      </div>
+    </div>
 
-		            <div class="pt-5 mt-5">
-		              <h3 class="mb-5 font-weight-bold">Комментарии:</h3>
-		              <ul class="comment-list">
-						{% include 'blog/includes/show_comments.html' with post_id=post.id post_slug=post.slug %}
+    <div class="pt-5 mt-5">
+      <h3 class="mb-5 font-weight-bold">Комментарии:</h3>
+      <ul class="comment-list">
+        {% include 'blog/includes/show_comments.html' with post_id=post.id post_slug=post.slug %}
 
-		              </ul>
-		              <!-- END comment-list -->
+      </ul>
+      <!-- END comment-list -->
 
-		              {% include 'blog/includes/comments_form.html' with post_id=post.id post_slug=post.slug %}
-		            </div>
+      {% include 'blog/includes/comments_form.html' with post_id=post.id post_slug=post.slug %}
+    </div>
 {% endblock content %}
 {% block recommended%}
 <div class="sidebar-box ftco-animate">
@@ -47,6 +48,7 @@
 		  <div><a href="{{ p.get_absolute_url }}"><span class="icon-calendar"></span> {{ p.publish|date:'F d, Y H:i' }}</a></div>
 		  <div><a href="{{ p.author.user.get_absolute_url }}"><span class="icon-person"></span> {{ p.author }}</a></div>
 		  <div><a href="{{ p.get_absolute_url }}"><span class="icon-chat"></span> {{ p.comments.count }}</a></div>
+          <div><a href="{{ p.get_absolute_url }}"><span><i class="icon-eye mr-2"></i></span>{% get_post_views post=p %}</a></div>
 		</div>
 	  </div>
 	</div>

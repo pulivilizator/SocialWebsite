@@ -1,5 +1,6 @@
 {% load static %}
 {% load blog_tags %}
+{% load cache %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,13 +63,7 @@
   </style>
 </head>
 <body>
-	{% if messages %}
-		
-	{% for message in messages %}
-		{{ message|safe }}
-	{% endfor %}
-		
-	{% endif %}
+{% cache 1200 hdr %}
 	<div id="colorlib-page">
 		<a href="#" class="js-colorlib-nav-toggle colorlib-nav-toggle"><i></i></a>
 		<aside id="colorlib-aside" role="complementary" class="js-fullheight">
@@ -85,6 +80,7 @@
 	    		<div class="row d-flex">
 	    			<div class="col-xl-8 py-5 px-md-5">
 	    				<div class="row pt-md-4">
+                        {% endcache %}
 						{% block content %}
 						{% endblock %}
 			    		</div><!-- END-->
@@ -150,6 +146,5 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
   <script src="{% static 'js/google-map.js' %}"></script>
   <script src="{% static 'js/main.js' %}"></script>
-
   </body>
 </html>

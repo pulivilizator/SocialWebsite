@@ -26,7 +26,8 @@
       {% for t in p.tags.all %}
         <span><a href="{% url 'blog:home' %}?tag_slug={{t.slug}}"><i class="icon-folder-o mr-2"></i>{{ t }}</a></span>
 			{% endfor %}
-      <span><i class="icon-comment2 mr-2"></i>{{ p.comments.count }}</span>
+      <span><i class="icon-comment2 mr-2"></i>{{ p.comments.count }}</span><span><i class="icon-eye mr-2"></i>{% get_post_views post=p %}</span>
+
     </p>
   </div>
   <p class="mb-4">{{p.content|truncatewords_html:30|linebreaks|markdown}}</p>

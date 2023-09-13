@@ -32,13 +32,16 @@ sitemaps = {
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('blog.urls')),
     path('', lambda request: redirect('blog:home')),
-    path('', include('users.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
          name='django.contrib.sitemaps.views.sitemap'),
     path('feed/', LatestPostsFeed(), name='post_feed'),
-    path('', include('mailings.urls')),
     path('', include('social_django.urls'), name='social'),
+    path('__debug__', include('debug_toolbar.urls')),
+
+    path('', include('blog.urls')),
+    path('', include('users.urls')),
+    path('', include('mailings.urls')),
+
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

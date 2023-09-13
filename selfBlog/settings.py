@@ -13,7 +13,7 @@ import os.path
 from pathlib import Path
 import sys
 
-from .config import db_config
+from .config import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +28,8 @@ SECRET_KEY = 'django-insecure-2=!azbpi$k+948jyn1i5p4m!e$uj2jo_04&7z-xg(s2&t3t&1f
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+CONFIG = config()
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'mysite.com']
 SITE_ID = 1
@@ -52,14 +54,15 @@ INSTALLED_APPS = [
     'taggit',
     'social_django',
     'django_extensions',
+    'debug_toolbar',
 ]
 
-SOCIAL_AUTH_VK_OAUTH2_KEY = '51743593'
-SOCIAL_AUTH_VK_OAUTH2_SECRET = 'e9Se4UIzdA1J6duIb506'
+SOCIAL_AUTH_VK_OAUTH2_KEY = CONFIG.sauth.vk_key
+SOCIAL_AUTH_VK_OAUTH2_SECRET = CONFIG.sauth.vk_secret
 SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1061169214615-ar04506ig970su3ierljn6lc2sb092k4.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.sauth.google_key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.sauth.google_secret
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']
 
 SOCIAL_AUTH_PIPELINE = [
@@ -78,6 +81,7 @@ SOCIAL_AUTH_PIPELINE = [
 LOGIN_REDIRECT_URL = 'https://mysite.com:8000/home/'
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -120,19 +124,31 @@ SOCIAL_AUTH_VK_OAUTH2_REDIRECT_URI = 'http://127.0.0.1:8000/home'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASE_CONFIG = db_config()
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': DATABASE_CONFIG.name,
-        'USER': DATABASE_CONFIG.user,
-        'PASSWORD': DATABASE_CONFIG.password,
-        'HOST': DATABASE_CONFIG.host,
-        'PORT': DATABASE_CONFIG.port
+        'NAME': CONFIG.db.name,
+        'USER': CONFIG.db.user,
+        'PASSWORD': CONFIG.db.password,
+        'HOST': CONFIG.db.host,
+        'PORT': CONFIG.db.port
     }
 }
 
+REDIS_HOST = CONFIG.redis.host
+REDIS_PORT = CONFIG.redis.port
+REDIS_DB = CONFIG.redis.db
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
+        "OPTIONS": {
+            "db": REDIS_DB,
+        },
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -186,8 +202,12 @@ MEDIA_URL = '/media/'
 LOGIN_URL = 'blog:login'
 LOGOUT_URL = 'blog:logout'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'DmitriyDmGora@gmail.com'
-EMAIL_HOST_PASSWORD = 'rwsixilpifcdqfes'
-EMAIL_PORT = 587
+EMAIL_HOST = CONFIG.smtp.email_host
+EMAIL_HOST_USER = CONFIG.smtp.email_host_user
+EMAIL_HOST_PASSWORD = CONFIG.smtp.email_host_password
+EMAIL_PORT = CONFIG.smtp.email_port
 EMAIL_USE_TLS = True
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

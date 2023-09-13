@@ -1,14 +1,14 @@
 from django import template
 from django.db.models import Count, Q
-from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from ..models import *
 from blog.models import *
+from ..views import r
 
-from taggit.models import Tag
 from datetime import timedelta
 import markdown
+
 
 register = template.Library()
 
@@ -22,7 +22,7 @@ def show_menu(path):
 
 @register.inclusion_tag('blog/includes/children_comment.html')
 def show_children_comments(comment, form, post_id, post_slug):
-    comments = comment.children.all()
+    comments = comment.children.all().select_related('author').select_related('author__user')
     return {'comments': comments, 'form': form, 'post_id': post_id, 'post_slug': post_slug}
 
 
@@ -43,6 +43,11 @@ def get_pupolated_posts(limit=5):
     return Post.objects.filter(Q(created__gte=start) & Q(created__lte=end), status=Post.Status.PUBLISH).annotate(
         s=Count('comments')).order_by('-s')[:limit]
 
+@register.simple_tag
+def get_post_views(post):
+    if not r.exists(f'post:{post.id}:views'):
+        r.set(f'post:{post.id}:views', 0)
+    return r.get(f'post:{post.id}:views').decode('utf-8')
 
 @register.filter(name='markdown')
 def makdown_format(text):

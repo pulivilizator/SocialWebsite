@@ -81,7 +81,7 @@ class CreateUser(DataMixin, CreateView):
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         user = form.save()
-        login(self.request, user)
+        login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         u = User.objects.get(username=form.cleaned_data['username'])
         profile = Profile(user=u, slug=u.username)
         profile.save()

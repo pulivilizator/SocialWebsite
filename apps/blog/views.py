@@ -4,6 +4,7 @@ from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.handlers.wsgi import WSGIRequest
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -11,12 +12,17 @@ from django.urls import reverse_lazy
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib import messages
 
+from selfBlog import settings
 from .models import *
 from .forms import *
 from .utils import *
 
 from slugify import slugify
+import redis
 
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB, )
 
 class HomePage(DataMixin, ListView):
     model = Post
@@ -32,7 +38,7 @@ class HomePage(DataMixin, ListView):
                 title='Блог', path=self.request.path, form_s=SearchForm())
             context.update(up_context)
         return context
-    
+
     def get_queryset(self) -> QuerySet[Any]:
         return create_queryset_for_homepage(self.request)
 
@@ -48,13 +54,18 @@ class PostDetail(DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         post = get_object_or_404(Post,
                                  id=self.kwargs['post_id'],
-                                 slug=self.kwargs['post_slug'])
+                                 slug=self.kwargs['post_slug'],
+                                 )
         if post.status == 'DF' and post.author != self.request.user:
             raise Http404
-        print(post.status)
-        parent_comments = post.comments.filter(parent=None)
-        up_context = self.get_user_context(
-            title=post.title, post=post, form=AddCommentForm(), form2=AddCommentForm(), parent_comments=parent_comments)
+        parent_comments = post.comments.filter(parent=None).select_related('author')
+        total_views = r.incr(f'post:{post.id}:views')
+        up_context = self.get_user_context(title=post.title,
+                                           post=post,
+                                           form=AddCommentForm(),
+                                           form2=AddCommentForm(),
+                                           parent_comments=parent_comments,
+                                           total_views=total_views)
         context.update(up_context)
         return context
 
